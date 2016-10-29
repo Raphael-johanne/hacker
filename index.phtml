@@ -1,0 +1,24 @@
+<?php  
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/QAPage">
+<head> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script type="text/javascript" src="./lib/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="./js/hack.js"></script>
+	<link rel="stylesheet" type="text/css" href="./css/style.css">
+</head>
+<body>
+<h1>hack</h1>
+<div id="error"></div>
+<label for="url">Url</label>
+<input type="text" id="url" value="" style="width:80%" />
+<input type="hidden" id="base_hack_url" value="<?php echo "http://$_SERVER[HTTP_HOST]/hack/util/hack.php"?>" />
+<a href="#" id="lunch">Lunch</a>
+<a href="javascript:window.location.reload();">Reset</a>
+<div id="hack-container"></div>
+<a href="#" class="clean">Clean</a>
+<div id="report"></div>
+<div id="process"></div>
+<a href="#" class="clean">Clean</a>
+</body>
+</html>

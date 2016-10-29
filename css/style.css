@@ -1,0 +1,35 @@
+@CHARSET "UTF-8";
+body{
+	margin:auto;
+	width:800px;
+	height:auto;
+	border:1px solid silver;
+	padding:20px;
+	padding-top:20px;
+	font-family:calibri, verdana, arial;
+	    word-break: break-all;
+		}
+
+#hack-container{
+	background-color:black;
+	color:#fff;
+	width:95%;
+	padding:20px;
+	float:left;
+	position:relative;
+}
+
+#report {
+	width:95%;
+
+	border:1px solid grey;
+	background-color:silver;
+	padding:20px;
+}
+a {
+	text-decoration:none;
+	display:block;
+}
+#url{
+	width:500px:
+}
