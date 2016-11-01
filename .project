@@ -3,6 +3,7 @@
 	<name>hacker</name>
 	<comment></comment>
 	<projects>
+		<project>lizy</project>
 	</projects>
 	<buildSpec>
 	</buildSpec>

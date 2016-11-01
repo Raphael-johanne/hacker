@@ -4,7 +4,7 @@
 DESCRIPTION
 -----------
 
-Hack is an open source program to hack unprotected websites for SQL injection. if you do not want to be hacked, protect your site!
+Hack is an open source program to hack unprotected websites to SQL injection. if you do not want to be hacked, protect your website !
 
 GENERALITY
 -----------
@@ -16,7 +16,7 @@ INSTALLATION
 
 1. Clone the project
 2. Go to http://localhost/hacker
-
+3. Enter the website URL
 
 
 
