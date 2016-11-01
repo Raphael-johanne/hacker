@@ -298,9 +298,9 @@ class Hack
 	 * 
 	 * @return Hack
 	 */
-	protected function _setSuffixTable($suffix)
+	protected function setSuffixTable($suffix)
 	{
-		return $this->_setSuffix($suffix, 'table');
+		return $this->setSuffix($suffix, 'table');
 	}
 	
 	/**
