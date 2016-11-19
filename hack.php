@@ -65,7 +65,7 @@ class Hack
 		
 		$this->url 	= (isset($_GET['url'])) ? base64_decode($_GET['url']) : null; 
 		
-		if ($this->url  === null || $this->_checkUrl($this->url) !== 1) {
+		if ($this->url  === null || $this->checkUrl($this->url) !== 1) {
 			return $this->sendResponse(['error' => 'Url is incorrect']);
 		}
 		
