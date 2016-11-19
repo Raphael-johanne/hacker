@@ -29,7 +29,7 @@ class Hack
 	/** @var string get log data */
 	const GET_LOG_ACTION 				= 'get_log_action';
 	
-	/** @var string is hackable */
+	/** @var int allowed iteration */
 	const NBR_POTENTIAL_COL_ITERATION	= 50;
 	
 	/** @var string current action */
@@ -65,7 +65,7 @@ class Hack
 		
 		$this->url 	= (isset($_GET['url'])) ? base64_decode($_GET['url']) : null; 
 		
-		if ($this->url  === null || $this->_checkUrl($this->url) !== 1) {
+		if ($this->url  === null || $this->checkUrl($this->url) !== 1) {
 			return $this->sendResponse(['error' => 'Url is incorrect']);
 		}
 		
@@ -203,6 +203,7 @@ class Hack
 	
 	/**
 	 * get final data
+
 	 *
 	 * @return string
 	 */
@@ -269,7 +270,7 @@ class Hack
 	 *
 	 * @param unknown_type $msg
 	 */
-	private function log($msg)
+	protected function log($msg)
 	{
 		$fd = fopen($this->_filepath, "w");
 		$str = "[" . date("Y/m/d h:i:s", mktime()) . "] " . $msg;
@@ -328,7 +329,7 @@ class Hack
 	 *
 	 * @return string
 	 */
-	private function getUpperCaseInfo($content)
+	protected function getUpperCaseInfo($content)
 	{
 		$result = "";
 		$matches = [];
@@ -384,7 +385,7 @@ class Hack
 	 *
 	 * @return boolean
 	 */
-	private function checkUrl($url)
+	protected function checkUrl($url)
 	{
 		return preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i", $url);
 	}
